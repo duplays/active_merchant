@@ -4,10 +4,10 @@ module ActiveMerchant #:nodoc:
       module CyberSourceSop
         class Helper < ActiveMerchant::Billing::Integrations::Helper
           # Replace with the real mapping
-          mapping :account, ''
-          mapping :amount, ''
+          mapping :account, 'merchantID'
+          mapping :amount, 'amount'
         
-          mapping :order, ''
+          mapping :order, 'orderNumber'
 
           mapping :customer, :first_name => '',
                              :last_name  => '',
