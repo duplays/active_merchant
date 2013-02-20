@@ -4,7 +4,10 @@ module ActiveMerchant #:nodoc:
       module CyberSourceSop
         class Helper < ActiveMerchant::Billing::Integrations::Helper
 
-          mapping :order, 'orderNumber'
+          mapping :order,    'orderNumber'
+          mapping :account,  'merchantID'
+          mapping :currency, 'currency'
+          mapping :amount,   'amount'
 
           mapping :customer,
             :first_name => 'billTo_firstName',
