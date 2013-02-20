@@ -29,6 +29,13 @@ module ActiveMerchant #:nodoc:
           mapping :description, 'comments'
           mapping :tax, 'taxAmount'
 
+          mapping :credit_card,
+            :number               => 'card_accountNumber',
+            :expiry_month         => 'card_expirationMonth',
+            :expiry_year          => 'card_expirationYear',
+            :verification_value   => 'card_cvNumber',
+            :card_type            => 'card_cardType'
+
           mapping :notify_url, 'orderPage_merchantURLPostAddress'
           mapping :return_url, 'orderPage_receiptResponseURL'
           mapping :cancel_return_url, 'orderPage_cancelResponseURL'
