@@ -19,7 +19,10 @@ class CyberSourceSopHelperTest < Test::Unit::TestCase
     assert_field 'orderPage_transactionType', 'sale'
     assert_field 'orderPage_ignoreAVS', 'true'
     assert_field 'orderPage_version', '7'
-
+    assert_field 'orderPage_sendMerchantURLPost', 'true'
+    assert_field 'billTo_country', 'na'
+    assert_field 'billTo_city', 'na'
+    assert_field 'billTo_street1', 'na'
   end
 
   def test_signature_public_field

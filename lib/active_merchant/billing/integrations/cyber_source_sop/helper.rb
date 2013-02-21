@@ -87,6 +87,7 @@ module ActiveMerchant #:nodoc:
               add_field('orderPage_version', '7')
             end
 
+            insert_fixed_field()
             insert_timestamp_field()
             insert_signature_public()
           end
@@ -139,6 +140,13 @@ module ActiveMerchant #:nodoc:
             @fields['currency'] +
             get_microtime() +
             @fields['orderPage_transactionType'])
+          end
+
+          def insert_fixed_field
+            add_field('orderPage_sendMerchantURLPost', 'true')
+            add_field('billTo_country', 'na')
+            add_field('billTo_city', 'na')
+            add_field('billTo_street1', 'na')
           end
 
         end
