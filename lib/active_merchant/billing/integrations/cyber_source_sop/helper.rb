@@ -11,6 +11,8 @@ module ActiveMerchant #:nodoc:
           mapping :order,    'orderNumber'
           mapping :currency, 'currency'
           mapping :amount,   'amount'
+          mapping :ignore_avs, 'orderPage_ignoreAVS'
+          mapping :version, 'orderPage_version'
 
 
           mapping :customer,
@@ -78,14 +80,15 @@ module ActiveMerchant #:nodoc:
             unless options[:transaction_type].present?
               add_field('orderPage_transactionType', 'sale')
             end
-
-            # add_field('orderPage_ignoreAVS', options[:ignore_avs].present ? options[:ignore_avs] : 'true')
-
-            # add_field('orderPage_version', options[:version].present ? options[:version] : '7')
+            unless options[:ignore_avs].present?
+              add_field('orderPage_ignoreAVS', 'true')
+            end
+            unless options[:version].present?
+              add_field('orderPage_version', '7')
+            end
 
             insert_timestamp_field()
             insert_signature_public()
-
           end
 
           def valid_line_item?(item = {})

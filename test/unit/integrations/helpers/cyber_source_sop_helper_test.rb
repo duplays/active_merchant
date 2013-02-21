@@ -17,6 +17,8 @@ class CyberSourceSopHelperTest < Test::Unit::TestCase
     assert_field 'orderNumber', 'order-500'
     assert_field 'orderPage_timestamp', @helper.get_microtime()
     assert_field 'orderPage_transactionType', 'sale'
+    assert_field 'orderPage_ignoreAVS', 'true'
+    assert_field 'orderPage_version', '7'
 
   end
 
