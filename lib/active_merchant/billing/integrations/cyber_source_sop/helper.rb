@@ -3,12 +3,15 @@ module ActiveMerchant #:nodoc:
     module Integrations #:nodoc:
       module CyberSourceSop
         class Helper < ActiveMerchant::Billing::Integrations::Helper
-          mapping :order,    'orderNumber'
+
           mapping :account,  'merchantID'
+          mapping :credential2, 'orderPage_serialNumber'
+          mapping :transaction_type, 'orderPage_transactionType'
+
+          mapping :order,    'orderNumber'
           mapping :currency, 'currency'
           mapping :amount,   'amount'
 
-          mapping :credential2 => 'orderPage_serialNumber'
 
           mapping :customer,
             :first_name => 'billTo_firstName',
@@ -60,12 +63,29 @@ module ActiveMerchant #:nodoc:
           # * :ignore_avs         default: 'true', can be: 'true', 'false'
           #                       Whether or not to ignore the AVS code when processing this transaction
           def initialize(order, account, options = {})
-            requires!(options, :credential2)
+            # TODO: require! is not raising exception as expected
+            # requires!(options, :credential2)
+            [:credential2, :amount, :currency, :shared_secret].each do | key |
+              unless options.has_key?(key)
+                raise ArgumentError.new("Missing required parameter: #{key}")
+              end
+            end
+
+            @shared_secret = options.delete(:shared_secret)
+
             super
 
-            add_field('orderPage_transactionType', options[:transaction_type].present ? options[:transaction_type] : 'sale')
-            add_field('orderPage_ignoreAVS', options[:ignore_avs].present ? options[:ignore_avs] : 'true')
-            add_field('orderPage_version', options[:version].present ? options[:version] : '7')
+            unless options[:transaction_type].present?
+              add_field('orderPage_transactionType', 'sale')
+            end
+
+            # add_field('orderPage_ignoreAVS', options[:ignore_avs].present ? options[:ignore_avs] : 'true')
+
+            # add_field('orderPage_version', options[:version].present ? options[:version] : '7')
+
+            insert_timestamp_field()
+            insert_signature_public()
+
           end
 
           def valid_line_item?(item = {})
@@ -89,6 +109,35 @@ module ActiveMerchant #:nodoc:
               add_field("item_#{idx}_quantity", quantity)
             end
           end
+
+          def insert_timestamp_field
+            add_field('orderPage_timestamp', get_microtime)
+          end
+
+          def insert_signature_public
+            add_field('orderPage_signaturePublic', sop_hash())
+          end
+
+          def get_microtime
+            t = Time.now
+            @time_stamp ||= sprintf("%d%03d", t.to_i, t.usec / 1000)
+          end
+
+          # private
+
+          def sop_hash
+            Base64.encode64(OpenSSL::HMAC.digest(OpenSSL::Digest::SHA1.new,
+              @shared_secret, sop_data)).chomp.gsub(/\n/,'')
+          end
+
+          def sop_data
+            (@fields['merchantID'] +
+            @fields['amount'] +
+            @fields['currency'] +
+            get_microtime() +
+            @fields['orderPage_transactionType'])
+          end
+
         end
       end
     end

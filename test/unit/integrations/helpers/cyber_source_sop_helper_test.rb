@@ -5,14 +5,47 @@ class CyberSourceSopHelperTest < Test::Unit::TestCase
 
   def setup
     @helper = CyberSourceSop::Helper.new('order-500', 'CyberSource_TestID',
-      :amount => 500, :currency => 'AED')
+      {:amount => 500, :currency => 'AED', :credential2 => 'Test_serialNumber',
+        :shared_secret => 'Test_sharedSecret'})
   end
 
   def test_basic_helper_fields
     assert_field 'merchantID', 'CyberSource_TestID'
+    assert_field 'orderPage_serialNumber', 'Test_serialNumber'
     assert_field 'currency', 'AED'
     assert_field 'amount', '500'
     assert_field 'orderNumber', 'order-500'
+    assert_field 'orderPage_timestamp', @helper.get_microtime()
+    assert_field 'orderPage_transactionType', 'sale'
+
+  end
+
+  def test_signature_public_field
+    assert_field 'orderPage_signaturePublic', @helper.sop_hash()
+  end
+
+  def test_missing_credential2_mapping
+    assert_raise ArgumentError do
+      CyberSourceSop::Helper.new('order-500', 'CyberSource_TestID',
+        { :amount => 500, :currency => 'AED',
+          :shared_secret => 'Test_sharedSecret'})
+    end
+  end
+
+  def test_missing_shared_secret
+    assert_raise ArgumentError do
+      CyberSourceSop::Helper.new('order-500', 'CyberSource_TestID',
+        { :amount => 500, :currency => 'AED',
+          :shared_secret => 'Test_sharedSecret'})
+    end
+  end
+
+  def test_missing_shared_secret
+    assert_raise ArgumentError do
+      CyberSourceSop::Helper.new('order-500', 'CyberSource_TestID',
+        { :amount => 500, :currency => 'AED',
+          :credential2 => 'Test_serialNumber'})
+    end
   end
 
   def test_customer_fields
