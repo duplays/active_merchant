@@ -23,6 +23,7 @@ class CyberSourceSopHelperTest < Test::Unit::TestCase
     assert_field 'billTo_country', 'na'
     assert_field 'billTo_city', 'na'
     assert_field 'billTo_street1', 'na'
+    assert_field 'billTo_firstName', nil
   end
 
   def test_signature_public_field

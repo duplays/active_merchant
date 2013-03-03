@@ -87,9 +87,10 @@ module ActiveMerchant #:nodoc:
               add_field('orderPage_version', '7')
             end
 
-            insert_fixed_field()
+            insert_fixed_fields()
             insert_timestamp_field()
             insert_signature_public()
+            insert_card_fields()
           end
 
           def valid_line_item?(item = {})
@@ -122,6 +123,22 @@ module ActiveMerchant #:nodoc:
             add_field('orderPage_signaturePublic', sop_hash())
           end
 
+          def insert_fixed_fields
+            add_field('orderPage_sendMerchantURLPost', 'true')
+            add_field('billTo_country', 'na')
+            add_field('billTo_city', 'na')
+            add_field('billTo_street1', 'na')
+          end
+
+          def insert_card_fields
+            result = []
+            # result << "<input id=\"#{field}\" name=\"#{field}\" type=\"hidden\" value=\"#{value}\" />\n"
+            result << "First Name: <input autocomplete=\"off\" type=\"text\" name=\"billTo_firstName\" />\n"
+            result= result.join("\n")
+
+            concat(result.respond_to?(:html_safe) ? result.html_safe : result)
+          end
+
           def get_microtime
             t = Time.now
             @time_stamp ||= sprintf("%d%03d", t.to_i, t.usec / 1000)
@@ -140,13 +157,6 @@ module ActiveMerchant #:nodoc:
             @fields['currency'] +
             get_microtime() +
             @fields['orderPage_transactionType'])
-          end
-
-          def insert_fixed_field
-            add_field('orderPage_sendMerchantURLPost', 'true')
-            add_field('billTo_country', 'na')
-            add_field('billTo_city', 'na')
-            add_field('billTo_street1', 'na')
           end
 
         end
