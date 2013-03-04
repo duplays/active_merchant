@@ -48,6 +48,7 @@ module ActiveMerchant #:nodoc:
           mapping :notify_url, 'orderPage_merchantURLPostAddress'
           mapping :return_url, 'orderPage_receiptResponseURL'
           mapping :cancel_return_url, 'orderPage_cancelResponseURL'
+          mapping :decline_url, 'orderPage_declineResponseURL'
 
           # These are the options that need to be used with payment_service_for with the
           # :cyber_source_sop service
